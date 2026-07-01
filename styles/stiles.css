@@ -1,0 +1,53 @@
+body {
+    background-color: antiquewhite;
+    margin: 0 auto;
+}
+
+#statistic {
+    display: flex;
+    width: 80%;
+    justify-content: space-evenly;
+    padding: 1em;
+    background-color: antiquewhite;
+}
+
+#listOfGames {
+    display: flex;
+    width: 80%;
+    padding: 3em;
+    font-family: cursive;
+    font-size: 1.5em;
+}
+
+#drawing-canvas, main {
+    margin: 0 5em;
+}
+
+.arrows {
+    font-size: 2em;
+    vertical-align: middle;
+    color: firebrick;
+}
+
+#instruction {
+    width: 500px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: anchor-center;
+}
+
+#infoBlock {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: anchor-center;
+}
+
+#score {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: anchor-center;
+}
+
+main {
+    display: none;
+}

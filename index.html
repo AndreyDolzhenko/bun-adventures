@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>bun escape</title>
+        <link rel="stylesheet" href="./styles/stiles.css" />
+        <link rel="icon" type="image/png" sizes="32x32" href="../img/AG1.png">
+    </head>
+    <body>
+        <div id="statistic">
+            <p>
+                Счёт:
+            </p> 
+            <div id="score">0</div>
+            <div id="infoBlock">
+                Старт
+            </div>
+            <div id="instruction">
+                ВПЕРЁД - <span class="arrows">&#8680;</span>
+                ПРЫЖОК - <span class="arrows">&#8679;</span>
+                СТОП - <span class="arrows">&#8681;</span>
+                СТАРТ - <span class="arrows">&#8678;</span>
+            </div>
+        </div>
+        <canvas id="drawing-canvas" width="800" height="600"></canvas>
+
+        <main></main>
+
+
+        <section>
+            <table>
+                <tr>
+                    <th>Твой выигрыш:</th>
+                </tr>
+                <tr>
+                    <td>win 1</td>
+                    <td>win 2</td>
+                    <td>win 3</td>
+                </tr>
+
+            </table>
+        </section>
+
+        <script src="./src/products.js"></script>
+        <script src="./libraries/pixi.min.js"></script>
+        <script src="./src/spaceFunctions.js"></script>
+        <script src="./src/functions.js"></script>
+        <script src="./src/main.js"></script>
+    </body>
+</html>
