@@ -8,10 +8,6 @@ arrProductSTM.map((el) => {
 // УПРАВЛЕНИЕ КАРТИНКАМИ СТМ (без повторений)
 // ============================================
 
-// ============================================
-// УПРАВЛЕНИЕ КАРТИНКАМИ СТМ (без повторений)
-// ============================================
-
 // Хранилище использованных картинок
 const usedImages = new Set();
 
@@ -88,15 +84,15 @@ async function showRandomSTM(x, y, duration = 5000) {
     }
 
     try {
-        const imagePath = randomProduct.imgShow;
+        const imagePath = randomProduct;
 
         // Сразу отмечаем картинку как использованную (при любом исходе)
-        usedImages.add(imagePath);
+        usedImages.add(imagePath.imgShow);
         const remaining = getRemainingImagesCount();
         console.log(`📌 Использовано: ${usedImages.size} из ${arrProductSTM.length}. Осталось: ${remaining}`);
 
         // Загружаем картинку
-        const texture = await PIXI.Assets.load(imagePath);
+        const texture = await PIXI.Assets.load(imagePath.imgShow);
         const sprite = new PIXI.Sprite(texture);
 
         sprite.position.set(x || 400, y || 300);
@@ -118,7 +114,11 @@ async function showRandomSTM(x, y, duration = 5000) {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance < 80) {
-                console.log(`🎯 Поймал ${imagePath}!`);
+                console.log(`🎯 Поймал ${imagePath.imgShow}!`);
+                tableFulling(imagePath.imgShow, true, imagePath.description);
+                currentScore += 1;
+                const score = document.getElementById("score");
+                score.innerText = currentScore;
 
                 // Удаляем ticker
                 app.ticker.remove(collisionChecker);
@@ -149,6 +149,7 @@ async function showRandomSTM(x, y, duration = 5000) {
         // Автоудаление через duration
         const timeoutId = setTimeout(() => {
             if (sprite.parent) {
+                tableFulling(imagePath.imgShow, false, imagePath.description);
                 app.stage.removeChild(sprite);
                 sprite.destroy();
                 app.ticker.remove(collisionChecker);
@@ -172,14 +173,14 @@ async function showRandomSTM(x, y, duration = 5000) {
 }
 
 // Функция для случайного индекса
-function getRandomProduct() {
-    if (!arrProductSTM || arrProductSTM.length === 0) {
-        console.error("❌ Массив arrProductSTM пуст");
-        return null;
-    }
-    const randomIndex = Math.floor(Math.random() * arrProductSTM.length);
-    return arrProductSTM[randomIndex];
-}
+// function getRandomProduct() {
+//     if (!arrProductSTM || arrProductSTM.length === 0) {
+//         console.error("❌ Массив arrProductSTM пуст");
+//         return null;
+//     }
+//     const randomIndex = Math.floor(Math.random() * arrProductSTM.length);
+//     return arrProductSTM[randomIndex];
+// }
 
 const bun = createBun(50, 450); // позиция колобка
 
@@ -187,6 +188,9 @@ const spaceShip = new PIXI.Container();
 
 const goToLevelTwo = () => {
     level = 2;
+    const score = document.getElementById("score");
+    currentScore = 0;
+    score.innerText = currentScore;
     console.log("level - ", level);
     // Блокировка на уровне 2 (или если игра закончена)
     if (level === 2) {
@@ -310,23 +314,6 @@ document.addEventListener("keydown", (event) => {
                 break;
         }
     }
-
-    // if (level === 2) {
-    //     switch (event.key) {
-    //         case "ArrowLeft":
-    //             keys.left = true;
-    //             break;
-    //         case "ArrowRight":
-    //             keys.right = true;
-    //             break;
-    //         case "ArrowUp":
-    //             keys.up = true;
-    //             break;
-    //         case "ArrowDown":
-    //             keys.down = true;
-    //             break;
-    //     }
-    // }
 });
 
 // Отслеживаем отпускание клавиш
@@ -346,17 +333,6 @@ document.addEventListener("keyup", (event) => {
             break;
     }
 });
-
-// Игровой цикл для уровня 2
-// app.ticker.add(() => {
-//     if (level === 2) {
-//         let speed = 5;
-//         if (keys.left) bun.position.x -= speed;
-//         if (keys.right) bun.position.x += speed;
-//         if (keys.up) bun.position.y -= speed;
-//         if (keys.down) bun.position.y += speed;
-//     }
-// });
 
 // Звёзды !!!
 function createColorfulStars(count = 120) {
@@ -589,7 +565,7 @@ async function Init() {
     app.ticker.add(async () => {
         stmDistance++;
 
-        if (stmDistance % 300 === 0 && level === 3) {
+        if (stmDistance % 120 === 0 && level === 3) {
             console.log("🔄 Показываем новую картинку");
 
             // Проверяем, остались ли ещё картинки
@@ -600,9 +576,9 @@ async function Init() {
 
             // Показываем случайную картинку в случайной позиции
             const x = 100 + Math.random() * 600;
-            const y = 100 + Math.random() * 300;
+            const y = 100 + Math.random() * 500;
 
-            await showRandomSTM(x, y, 5000);
+            await showRandomSTM(x, y, 3000);
         }
     });
 
