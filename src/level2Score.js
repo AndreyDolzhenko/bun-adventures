@@ -134,6 +134,7 @@ async function exportTableWithImagesToExcel() {
 function tableFulling(item, check, description) {
     // Создаём одну строку
     const tr = document.createElement("tr");
+    tr.className = "goodsPictures";
 
     // Ячейка с картинкой
     const tdImg = document.createElement("td");

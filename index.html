@@ -16,41 +16,49 @@
                 ВПЕРЁД - <span class="arrows">&#8680;</span> ПРЫЖОК - <span class="arrows">&#8679;</span> СТОП -
                 <span class="arrows">&#8681;</span> СТАРТ - <span class="arrows">&#8678;</span>
             </div>
+            <select name="choseLevel" id="choseLevel">
+                <option value="startLevel">выберите уровень</option>
+                <option value="firstLevel">уровень 1</option>
+                <option value="secondLevel">уровень 2</option>
+                <option value="thirdLevel">уровень 3</option>
+            </select>
         </div>
         <canvas id="drawing-canvas" width="800" height="600"></canvas>
 
-        <div id="level2" style="display: flex">
-            <main></main>
+        <div style="display: flex">
+            <main id="level2"></main>            
+            <div id="level3"></div>
             <div style="height: 500px; overflow-y: auto; flex-shrink: 0; width: 300px;">
-                <table id="gameResult">
-                    <thead>
-                        <tr>
-                            <td>
-                                <button onclick="exportTableWithImagesToExcel()">📥 Скачать результаты</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Твой выигрыш:</th>
-                        </tr>
-                    </thead>
-                    <tbody id="level2Win"></tbody>
-                    <thead>
-                        <tr>
-                            <th>Ты потерял:</th>
-                        </tr>
-                    </thead>
-                    <tbody id="level2Lose"></tbody>
-                </table>
+                    <table id="gameResult">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <button onclick="exportTableWithImagesToExcel()">📥 Скачать результаты</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Твой выигрыш:</th>
+                            </tr>
+                        </thead>
+                        <tbody id="level2Win"></tbody>
+                        <thead>
+                            <tr>
+                                <th>Ты потерял:</th>
+                            </tr>
+                        </thead>
+                        <tbody id="level2Lose"></tbody>
+                    </table>
+        </div>
 
             </div>
-        </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 
+        <script src="./libraries/pixi.min.js"></script>
+        <script src="./src/levelThreeBase.js"></script>
         <script src="./src/level2Score.js"></script>
         <script src="./src/products.js"></script>
-        <script src="./libraries/pixi.min.js"></script>
         <script src="./src/spaceFunctions.js"></script>
         <script src="./src/functions.js"></script>
         <script src="./src/main.js"></script>

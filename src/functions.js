@@ -159,7 +159,7 @@ function forest(startPoint, interval, stumpMooving, homeMooving, startText, star
     owl(startPosition);
     hare(harePosition);
 
-    currentScore > 20 ? PortalInSpice() : false;
+    currentScore > 50 ? PortalInSpice() : false;
 }
 
 let currentInterval = null;

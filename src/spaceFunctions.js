@@ -1,8 +1,14 @@
 const app = new PIXI.Application();
+const zvuk_odnoy_kapli = new Audio("./sounds/zvuk-odnoy-kapli.mp3");
 
-arrProductSTM.map((el) => {
-    console.log("imgShow - ", el.imgShow);
-});
+// ============================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ============================================
+let isGameFinished = false; // флаг окончания игры
+
+// arrProductSTM.map((el) => {
+//     console.log("imgShow - ", el.imgShow);
+// });
 
 // ============================================
 // УПРАВЛЕНИЕ КАРТИНКАМИ СТМ (без повторений)
@@ -61,6 +67,7 @@ function resetUsedImages() {
     shuffledProducts = null;
     currentSprite = null;
     currentCollisionChecker = null;
+    isGameFinished = false;
     console.log("🔄 Список использованных картинок сброшен");
 }
 
@@ -80,6 +87,37 @@ async function showRandomSTM(x, y, duration = 5000) {
 
     if (!randomProduct || !randomProduct.imgShow) {
         console.log("🏁 Картинки закончились! Новая не будет показана");
+
+        // ✅ Показываем финальную картинку только один раз
+        if (!isGameFinished) {
+            isGameFinished = true;
+
+            try {
+                const finishTexture = await PIXI.Assets.load("./img/finish.png");
+                const finishSprite = new PIXI.Sprite(finishTexture);
+
+                finishSprite.anchor.set(0.5, 0.5);
+                finishSprite.position.set(400, 300);
+                finishSprite.scale.set(0.6, 0.6);
+                finishSprite.alpha = 0;
+
+                app.stage.addChild(finishSprite);
+                console.log("🎉 Финальная картинка загружена!");
+
+                // Плавное появление
+                let fadeProgress = 0;
+                const fadeTicker = app.ticker.add(() => {
+                    fadeProgress += 0.02;
+                    finishSprite.alpha = Math.min(fadeProgress, 1);
+                    if (fadeProgress >= 1) {
+                        app.ticker.remove(fadeTicker);
+                    }
+                });
+            } catch (err) {
+                console.error("❌ Не удалось загрузить финальную картинку:", err);
+            }
+        }
+
         return null;
     }
 
@@ -112,8 +150,10 @@ async function showRandomSTM(x, y, duration = 5000) {
             const dx = sprite.position.x - spaceShip.position.x;
             const dy = sprite.position.y - spaceShip.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
+            const blaster1 = new Audio("./sounds/blaster1.mp3");
 
             if (distance < 80) {
+                blaster1.play();
                 console.log(`🎯 Поймал ${imagePath.imgShow}!`);
                 tableFulling(imagePath.imgShow, true, imagePath.description);
                 currentScore += 1;
@@ -151,6 +191,7 @@ async function showRandomSTM(x, y, duration = 5000) {
             if (sprite.parent) {
                 tableFulling(imagePath.imgShow, false, imagePath.description);
                 app.stage.removeChild(sprite);
+                zvuk_odnoy_kapli.play();
                 sprite.destroy();
                 app.ticker.remove(collisionChecker);
                 console.log(`🗑️ Спрайт удалён через ${duration / 1000} секунд`);
@@ -172,21 +213,12 @@ async function showRandomSTM(x, y, duration = 5000) {
     }
 }
 
-// Функция для случайного индекса
-// function getRandomProduct() {
-//     if (!arrProductSTM || arrProductSTM.length === 0) {
-//         console.error("❌ Массив arrProductSTM пуст");
-//         return null;
-//     }
-//     const randomIndex = Math.floor(Math.random() * arrProductSTM.length);
-//     return arrProductSTM[randomIndex];
-// }
-
 const bun = createBun(50, 450); // позиция колобка
 
 const spaceShip = new PIXI.Container();
 
-const goToLevelTwo = () => {
+const goToLevelTwo = () => {    
+    grace_by_home.play();
     level = 2;
     const score = document.getElementById("score");
     currentScore = 0;
@@ -223,11 +255,6 @@ document.addEventListener("keydown", (event) => {
     if (level === 1) {
         switch (event.key) {
             case "ArrowRight":
-                // if (startPosition < 50) {
-                //     level = 2;
-                //     console.log("Ты выиграл! startPosition - ", startPosition);
-                //     return;
-                // }
                 console.log("level - ", level);
                 clearInterval(currentInterval);
                 CalmMooving();
@@ -258,7 +285,6 @@ document.addEventListener("keydown", (event) => {
                 break;
             case "ArrowRight":
                 console.log("bun.position.x - ", bun.position.x, "bun.position.y - ", bun.position.y);
-                // goToRight();
                 bun.position.x += 10;
                 break;
             case "ArrowUp":
@@ -273,7 +299,7 @@ document.addEventListener("keydown", (event) => {
     }
 
     // Обработка для уровня 3 (плавное движение)
-    if (level === 3) {
+    if (level === "rocketMoove") {
         switch (event.key) {
             case "ArrowLeft":
                 console.log(
@@ -291,7 +317,6 @@ document.addEventListener("keydown", (event) => {
                     "spaceShip.position.y - ",
                     spaceShip.position.y
                 );
-                // goToRight();
                 spaceShip.position.x += 10;
                 break;
             case "ArrowUp":
@@ -360,7 +385,6 @@ function createColorfulStars(count = 120) {
 }
 
 // Мерцающие звёзды
-
 function createTwinklingStars(count = 150) {
     const stars = new PIXI.Container();
     const starData = [];
@@ -395,7 +419,6 @@ function createTwinklingStars(count = 150) {
         const time = Date.now() / 1000;
         starData.forEach((data) => {
             const {star, speed, phase, minAlpha, maxAlpha} = data;
-            // Плавное изменение прозрачности по синусоиде
             star.alpha = minAlpha + (maxAlpha - minAlpha) * (0.5 + 0.5 * Math.sin(time * speed + phase));
         });
     });
@@ -446,8 +469,8 @@ function createBun(x, y) {
 
 const flame = (start) => {
     const line = new PIXI.Graphics();
-    line.moveTo(start, 165); // начальная точка
-    line.lineTo(start, 200); // следующая точка
+    line.moveTo(start, 165);
+    line.lineTo(start, 200);
     line.stroke({width: 3, color: "#FF8C00"});
 
     let flameScale = 0;
@@ -458,7 +481,7 @@ const flame = (start) => {
     app.ticker.add(() => {
         frameCounter++;
 
-        console.log("startPosition - ", startPosition);
+        // console.log("startPosition - ", startPosition);
 
         if (frameCounter % 30 > 0 && frameCounter % 30 < 15) {
             line.scale.set(1, 1.06);
@@ -493,7 +516,6 @@ async function Init() {
     const texture = await PIXI.Assets.load("./img/moonGround.png");
     const moonGround = new PIXI.Sprite(texture);
 
-    // Настрой размер и позицию (чтобы точно увидеть)
     moonGround.width = 800;
     moonGround.height = 200;
     moonGround.position.set(0, paramsOfPicture.moonGroundY);
@@ -501,62 +523,55 @@ async function Init() {
     spaceShip.position.set(paramsOfPicture.shipPositionX, paramsOfPicture.shipPositionY);
 
     const bodyOfShip = new PIXI.Graphics();
-    // bodyOfShip.position.set(200, 400);
-    bodyOfShip.rect(0, 0, 100, 150); // x, y — верхний левый угол
+    bodyOfShip.rect(0, 0, 100, 150);
     bodyOfShip.fill(0xffffff);
-    bodyOfShip.stroke({width: 2, color: 0x333333}); // обводка для красоты
+    bodyOfShip.stroke({width: 2, color: 0x333333});
 
     const leftEngine = new PIXI.Graphics();
-    leftEngine.poly([0, 100, -40, 160, 40, 160]); // массив координат
+    leftEngine.poly([0, 100, -40, 160, 40, 160]);
     leftEngine.fill(0xffffff);
-    leftEngine.stroke({width: 2, color: 0x333333}); // обводка для красоты
+    leftEngine.stroke({width: 2, color: 0x333333});
 
     const rightEngine = new PIXI.Graphics();
-    rightEngine.poly([100, 100, 60, 160, 140, 160]); // массив координат
+    rightEngine.poly([100, 100, 60, 160, 140, 160]);
     rightEngine.fill(0xffffff);
-    rightEngine.stroke({width: 2, color: 0x333333}); // обводка для красоты
+    rightEngine.stroke({width: 2, color: 0x333333});
 
     spaceShip.addChild(bodyOfShip);
     spaceShip.addChild(leftEngine);
     spaceShip.addChild(rightEngine);
 
     let start = -20;
-
     for (let index = 0; index < 3; index++) {
         spaceShip.addChild(flame(start));
         start += 20;
     }
 
     start = 80;
-
     for (let index = 0; index < 3; index++) {
         spaceShip.addChild(flame(start));
         start += 20;
     }
 
     const headOfShip = new PIXI.Graphics();
-    headOfShip.poly([-30, 0, 50, -100, 130, 0]); // массив координат
+    headOfShip.poly([-30, 0, 50, -100, 130, 0]);
     headOfShip.fill(0xffffff);
-    headOfShip.stroke({width: 2, color: 0x333333}); // обводка для красоты
+    headOfShip.stroke({width: 2, color: 0x333333});
 
-    // Добавляем на сцену
     headOfShip.addChild(myText);
-
     spaceShip.addChild(headOfShip);
 
     const windowOfShip = new PIXI.Graphics();
-    windowOfShip.circle(50, 50, 30); // x, y — центр круга
+    windowOfShip.circle(50, 50, 30);
     windowOfShip.fill(0xffffff);
-    windowOfShip.stroke({width: 2, color: 0x333333}); // обводка для красоты
-
+    windowOfShip.stroke({width: 2, color: 0x333333});
     spaceShip.addChild(windowOfShip);
 
-    // Создаём звёзды (200 штук с мерцанием)
+    // Создаём звёзды (400 штук с мерцанием)
     const stars = createTwinklingStars(400);
     app.stage.addChild(stars);
 
     app.stage.addChild(moonGround);
-
     app.stage.addChild(spaceShip);
 
     // Инициализация
@@ -565,13 +580,20 @@ async function Init() {
     app.ticker.add(async () => {
         stmDistance++;
 
-        if (stmDistance % 120 === 0 && level === 3) {
+        if (stmDistance % 120 === 0 && level === "rocketMoove") {
+            // ✅ Если игра завершена — выходим
+            if (isGameFinished) {
+                return;
+            }
+
             console.log("🔄 Показываем новую картинку");
 
             // Проверяем, остались ли ещё картинки
             if (getRemainingImagesCount() === 0) {
                 console.log("🏁 Картинки закончились!");
-                return; // Выходим, не показываем больше
+                // Показываем финальную картинку через showRandomSTM
+                await showRandomSTM(400, 300, 3000);
+                return;
             }
 
             // Показываем случайную картинку в случайной позиции
@@ -582,38 +604,25 @@ async function Init() {
         }
     });
 
-    // const bun = createBun(50, 450); // позиция колобка
-
     bun.scale.set(0.8);
     app.stage.addChild(bun);
 
     let scaleOfShip = [1, 1];
-
     let intervalId = null;
-
     let startPositionChecker = 0;
 
     app.ticker.add(() => {
         startPositionChecker++;
-        // startPosition < 50 ? goToLevelTwo() : false;
 
         if (bun.position.x == 400 && bun.position.y == 350) {
             console.log("I'm in the rocket!");
 
-            level = 3;
+            level = "rocketMoove";
 
-            // Удаляем колобка из сцены
             app.stage.removeChild(bun);
-
-            // Добавляем внутрь ракеты
             spaceShip.addChild(bun);
+            bun.position.set(50, 50);           
 
-            // Устанавливаем позицию внутри ракеты (например, в иллюминаторе)
-            bun.position.set(50, 50); // относительно ракеты
-
-            level = 3;
-
-            // Запускаем полёт
             intervalId = setInterval(() => {
                 if (scoreOfShip != 0) {
                     spaceShip.scale.set(scaleOfShip[0], scaleOfShip[1]);
